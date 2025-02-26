@@ -5,7 +5,7 @@ on:
     types:
       - opened
       - reopened
-      - edited
+      - deleted
       - closed
       - assigned
       - unassigned
@@ -17,10 +17,13 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  ISSUE_NUMBER: ${{ github.event.issue.number }}
+  ISSUE_TITLE: ${{ github.event.issue.title }}
   ISSUE_URL: ${{ github.event.issue.html_url }}
 
 jobs:
   check-existence:
+    name: Check existence
     runs-on: ubuntu-latest
     outputs:
       page_id: ${{ steps.notion.outputs.page_id }}
@@ -34,19 +37,21 @@ jobs:
       - name: Check notion database
         id: notion
         run: |
+          body=$(jq -n --arg link "$ISSUE_URL" '{
+            "filter": {
+              "property": "Link",
+              "url": {
+                "equals": $link
+              }
+            },
+            "page_size": 1
+          }' | jq -c .)
+
           results=$(curl -X POST "https://api.notion.com/v1/databases/${{ secrets.NOTION_DATABASE_ID }}/query" \
             -H "Authorization: Bearer ${{ secrets.NOTION_API_KEY }}" \
             -H "Content-Type: application/json" \
             -H "Notion-Version: 2022-06-28" \
-            --data '{
-              "filter": {
-                "property": "Link",
-                "url": {
-                  "equals": "$ISSUE_URL"
-                }
-              },
-              "page_size": 1
-            }' | jq -r '.results');
+            --data "$body" | jq -r '.results');
 
             page_id=""
             status=""
@@ -65,25 +70,39 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       issues: write
+    env:
+      PAGE_ID: ${{ needs.check-existence.outputs.page_id }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      GH_REPO: ${{ github.repository }}
     steps:
+      - name: Search issue on GitHub
+        id: search
+        if: ${{ env.PAGE_ID }}
+        run: gh issue view "$ISSUE_NUMBER" --repo "$GH_REPO"
+        continue-on-error: true
+
       - name: Setup page peoperties
         id: properties
+        if: ${{ steps.search.outcome == 'skipped' || steps.search.outcome == 'success' }}
         env:
           CREATED_AT: ${{ github.event.issue.created_at }}
           CLOSED_AT: ${{ github.event.issue.closed_at }}
+          TIME_ZONE: ${{ vars.TIMEZONE }}
         run: |
           status="${{ needs.check-existence.outputs.status }}"
+          created_at=$(TZ="$TIME_ZONE" date -d "$CREATED_AT" +'%Y-%m-%dT%H:%M:%SZ')
           assignees=$(echo '${{ toJSON(github.event.issue.assignees.*.login) }}' | jq '[.[] | {name: .}]' | jq -c .)
           labels=$(echo '${{ toJSON(github.event.issue.labels.*.name) }}' | jq '[.[] | {name: .}]' | jq -c .)
-          date=$(echo '{
-            "start": "$CREATED_AT",
-            "end": "$end",
-            "time_zone": "${{ vars.TIMEZONE }}"
+          date=$(jq -n --arg start "$created_at" --arg time_zone "$TIME_ZONE" '{
+            "start": $start,
+            "end": null,
+            "time_zone": $time_zone
           }' | jq -c .)
 
           if [ "$CLOSED_AT" != "" ]; then
             status="Closed"
-            date=$(echo "$date" | jq '.end="$CLOSED_AT"' | jq -c .)
+            closed_at=$(TZ="$TIME_ZONE" date -d "$CLOSED_AT" +'%Y-%m-%dT%H:%M:%SZ')
+            date=$(echo "$date" | jq --arg end "$closed_at" '.end=$end' | jq -c .)
           else
             status="Opened"
           fi
@@ -95,51 +114,53 @@ jobs:
 
       - name: Setup parameters
         id: params
-        env:
-          ISSUE_TITLE: ${{ github.event.issue.title }}
         run: |
           echo "{}" > body.json
           method="PATCH"
           request_url="https://api.notion.com/v1/pages"
 
-          if [ "${{ needs.check-existence.outputs.page_id }}" != "" ]; then
-            request_url+="/${{ needs.check-existence.outputs.page_id }}"
-          fi
-
-          if [ "${{ needs.check-existence.outputs.page_id }}" == "" -a "${{ steps.properties.outputs.status }}" == "Opened" ]; then
+          if [ "$PAGE_ID" != "" ]; then
+            request_url+="/$PAGE_ID"
+          else
             method="POST"
             body=$(jq '. + { parent: { database_id: "${{ secrets.NOTION_DATABASE_ID }}" } }' body.json)
             echo "$body" > body.json
           fi
 
-          body=$(jq '. + {
-            properties: {
-              Status: {
-                select: {
-                  name: "${{ steps.properties.outputs.status }}"
-                }
-              },
-              Title: {
-                title: [{
-                  text: {
-                    content: "$ISSUE_TITLE"
-                  }
-                }]
-              },
-              Assignees: {
-                multi_select: ${{ steps.properties.outputs.assignees }}
-              },
-              Labels: {
-                multi_select: ${{ steps.properties.outputs.labels }}
-              },
-              Date: {
-                date: ${{ steps.properties.outputs.date }}
-              },
-              Link: {
-                url: "$ISSUE_URL"
+          if [ "${{ steps.properties.outcome }}" == "skipped" ]; then
+            body=$(jq '. + {
+              in_trash: "true"
+            }' body.json)
+          else
+            body=$(jq --arg title "$ISSUE_TITLE" --arg link "$ISSUE_URL" '. + { 
+              properties: {
+                Status: { 
+                  select: { 
+                    name: "${{ steps.properties.outputs.status }}"
+                  } 
+                },
+                Title: {
+                  title: [{
+                    text: {
+                      content: $title   
+                    }
+                  }]
+                },
+                Assignees: {
+                  multi_select: ${{ steps.properties.outputs.assignees }}  
+                },
+                Labels: {
+                  multi_select: ${{ steps.properties.outputs.labels }}  
+                },
+                Date: {
+                  date: ${{ steps.properties.outputs.date }}  
+                },
+                Link: {
+                  url: $link
+                }  
               }
-            }
-          }' body.json)
+            }' body.json)
+          fi
 
           echo "$body" > body.json
 
@@ -149,7 +170,6 @@ jobs:
 
       - name: Synchronize page properties with Notion
         id: sync
-        if: ${{ !(needs.check-existence.outputs.page_id == '' && steps.params.outputs.method == 'PATCH') }}
         run: |
           result=$(curl -X ${{ steps.params.outputs.method }} "${{ steps.params.outputs.request_url }}" \
             -H "Authorization: Bearer ${{ secrets.NOTION_API_KEY }}" \
@@ -165,12 +185,9 @@ jobs:
           echo "id=$prefix-$number" >> $GITHUB_OUTPUT
 
       - name: Comment on issue
-        if: ${{ needs.check-existence.outputs.page_id == '' }}
-        run: gh issue comment "$NUMBER" --body "$BODY"
+        if: ${{ !env.PAGE_ID }}
+        run: gh issue comment "$ISSUE_NUMBER" --body "$BODY"
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          GH_REPO: ${{ github.repository }}
-          NUMBER: ${{ github.event.issue.number }}
           BODY: |
             **_Synchronized Notion page_**
             > :id: **`${{ steps.sync.outputs.id }}`**
