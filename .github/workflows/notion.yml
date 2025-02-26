@@ -5,7 +5,7 @@ on:
     types:
       - opened
       - reopened
-      - edited
+      - deleted
       - closed
       - assigned
       - unassigned
@@ -21,6 +21,7 @@ env:
 
 jobs:
   check-existence:
+    name: Check existence
     runs-on: ubuntu-latest
     outputs:
       page_id: ${{ steps.notion.outputs.page_id }}
@@ -65,9 +66,22 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       issues: write
+    env:
+      PAGE_ID: ${{ needs.check-existence.outputs.page_id }}
     steps:
+      - name: Search issue on GitHub
+        id: search
+        if: ${{ env.PAGE_ID }}
+        run: gh issue view "$ISSUE_NUMBER" --repo "$GH_REPO"
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        continue-on-error: true
+
       - name: Setup page peoperties
         id: properties
+        if: ${{ steps.search.outcome == 'skipped' || steps.search.outcome == 'success' }}
         env:
           CREATED_AT: ${{ github.event.issue.created_at }}
           CLOSED_AT: ${{ github.event.issue.closed_at }}
@@ -165,7 +179,7 @@ jobs:
           echo "id=$prefix-$number" >> $GITHUB_OUTPUT
 
       - name: Comment on issue
-        if: ${{ needs.check-existence.outputs.page_id == '' }}
+        if: ${{ !env.PAGE_ID }}
         run: gh issue comment "$NUMBER" --body "$BODY"
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
