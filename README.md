@@ -19,12 +19,14 @@
 
 </div>
 
-### 1. Requirements
+## 1. Requirements
 
-- [x] [**Github Token**](https://github.com/settings/tokens)
-- [x] Notion [**Github issues**](https://herokwon.notion.site/173ca0268cb380ea8107cfc86f4f1ef3?v=6a198de8f1d64f7c8724e18f26487ba5) 템플릿
-- [x] Notion [**API 통합**](https://notion.so/profile/integrations) 시크릿  
-       :point_right: [Notion API 통합 | Notion (노션) 도움말 센터](https://www.notion.com/ko/help/create-integrations-with-the-notion-api)
+- [x] [**GitHub Token**](https://github.com/settings/tokens) 생성
+
+- [x] [**issues-notion-sync**](https://herokwon.notion.site/1a6ca0268cb380278a7becb09c697ec6?v=1a6ca0268cb380c39bfd000c07e0b778) Notion 템플릿 복제
+
+- [x] Notion [**API 통합**](https://notion.so/profile/integrations) 시크릿 생성  
+       :point_right: [Notion API 통합 | Notion 도움말 센터](https://notion.com/ko/help/create-integrations-with-the-notion-api)
 
 <br />
 
