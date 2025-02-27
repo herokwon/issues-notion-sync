@@ -30,18 +30,21 @@
 
 <br />
 
-### 2. Settings
+## 2. Settings
 
 - [x] 프로젝트 최상위에 **`.github`** 폴더 위치
-- [x] 사용자의 **Github issues** 페이지에 Notion API 연결  
-       :point_right: [API 통합 추가와 관리 - 페이지에 연결 추가 | Notion (노션) 도움말 센터](https://www.notion.com/ko/help/add-and-manage-connections-with-the-api?nxtPslug=add-and-manage-connections-with-the-api#%ED%8E%98%EC%9D%B4%EC%A7%80%EC%97%90-%EC%97%B0%EA%B2%B0-%EC%B6%94%EA%B0%80)
-- [x] **Notion 페이지 ID** 추출  
+
+- [x] 복제한 **issues-notion-sync** 페이지에 Notion API 연결  
+       :point_right: [API 통합 추가와 관리 - 페이지에 연결 추가 | Notion 도움말 센터](https://notion.com/ko/help/add-and-manage-connections-with-the-api?nxtPslug=add-and-manage-connections-with-the-api#%ED%8E%98%EC%9D%B4%EC%A7%80%EC%97%90-%EC%97%B0%EA%B2%B0-%EC%B6%94%EA%B0%80)
+
+- [x] Notion **페이지 ID** 추출  
        :point_right: [Build your first integration - Environment variables | Notion Developers](https://developers.notion.com/docs/create-a-notion-integration#environment-variables)
-- [x] Github **Repository secrets** 설정
+
+- [x] GitHub **Repository secrets** 설정
   ```
-  - GH_TOKEN: Github Token
-  - NOTION_API_KEY: 사용자의 프라이빗 Notion API 통합 시크릿
-  - NOTION_DATABASE_ID: 사용자가 복제한 Github issues 페이지 ID
+  GH_TOKEN: GitHub Token
+  NOTION_API_KEY: 사용자의 프라이빗 Notion API 통합 시크릿
+  NOTION_DATABASE_ID: 사용자가 복제한 GitHub issues 페이지 ID
   ```
 
 <br />
