@@ -153,3 +153,4 @@ body=$(jq --arg title "$ISSUE_TITLE" --arg link "$ISSUE_URL" '. + {
 ## Reference
 
 - [Notion Developers](https://developers.notion.com)
+- [Notion 도움말 센터](https://notion.com/ko/help)
