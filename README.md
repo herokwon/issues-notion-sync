@@ -1,17 +1,21 @@
 <div align="center">
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" width="128px" height="128px" srcset="images/github-dark.png">
-  <img alt="Github logo" width="128px" height="128px" src="images/github-light.png">
-</picture>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<img alt="Notion logo" src="images/notion.png" width="128px" height="128px" />
+# Issues Notion Sync
 
 </div>
 
 <div align="center">
 
-# Issues Notion Sync
+<a href="https://github.com">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" width="128px" height="128px" srcset="images/github-dark.png">
+    <img alt="GitHub logo" width="128px" height="128px" src="images/github-light.png">
+  </picture>
+</a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://notion.com/product">
+  <img alt="Notion logo" src="images/notion.png" width="128px" height="128px" />
+</a>
 
 </div>
 
