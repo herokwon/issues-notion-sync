@@ -49,19 +49,18 @@
 
 <br />
 
-### 3. (Optional) Custom Properties
+## 3. (Optional) Custom Properties
 
-> **Github issues** 페이지에 적용된 기본 속성과 데이터 형식, 설명  
-> (사용자가 임의로 변경하여 활용 가능)
+> **issues-notion-sync** 페이지의 기본 속성과 데이터 형식, 설명 → [Notion API](https://developers.notion.com/reference) 활용 커스텀 가능
 
-|     속성      |        데이터 형식        | 설명                                          |
-| :-----------: | :-----------------------: | :-------------------------------------------- |
-|  **Status**   |      [선택][select]       | Issue 상태(**`Opened`**, **`Closed`**)        |
-|   **Title**   |       [제목][title]       | Issue 제목                                    |
-| **Assignees** | [다중 선택][multi-select] | Issue 담당자                                  |
-|  **Labels**   | [다중 선택][multi-select] | Issue 레이블 목록                             |
-|   **Date**    |       [날짜][date]        | Issue 생성 ~ 종료 기간 (시간 포함 / UTC 기준) |
-|   **Link**    |        [URL][url]         | Issue 바로가기 링크                           |
+|     속성      |        데이터 형식        | 설명                                                    |
+| :-----------: | :-----------------------: | :------------------------------------------------------ |
+|  **Status**   |      [선택][select]       | Issue 상태(**`Opened`**, **`Closed`**)                  |
+|   **Title**   |       [제목][title]       | Issue 제목                                              |
+| **Assignees** | [다중 선택][multi-select] | Issue 담당자                                            |
+|  **Labels**   | [다중 선택][multi-select] | Issue 레이블 목록                                       |
+|   **Date**    |       [날짜][date]        | Issue 생성 ~ 종료 기간 (시간 포함 / TIMEZONE 설정 기준) |
+|   **Link**    |        [URL][url]         | Issue 바로가기 링크                                     |
 
 [select]: https://developers.notion.com/reference/page-property-values#select "선택 형식 보기"
 [title]: https://developers.notion.com/reference/page-property-values#title "제목 형식 보기"
@@ -71,34 +70,39 @@
 
 ```yml
 # [.github/workflows/notion.yml]
-# 116 ~ 141 Lines
+# 135 ~ 162 Lines
+
 …
-properties: {
-  Status: {
-    select: {
-      name: "${{ steps.properties.outputs.status }}"
-    }
-  },
-  Title: {
-    title: [{
-      text: {
-        content: "$ISSUE_TITLE"
+
+body=$(jq --arg title "$ISSUE_TITLE" --arg link "$ISSUE_URL" '. + {
+  properties: {
+    Status: {
+      select: {
+        name: "${{ steps.properties.outputs.status }}"
       }
-    }]
-  },
-  Assignees: {
-    multi_select: ${{ steps.properties.outputs.assignees }}
-  },
-  Labels: {
-    multi_select: ${{ steps.properties.outputs.labels }}
-  },
-  Date: {
-    date: ${{ steps.properties.outputs.date }}
-  },
-  Link: {
-    url: "$ISSUE_URL"
+    },
+    Title: {
+      title: [{
+        text: {
+          content: $title
+        }
+      }]
+    },
+    Assignees: {
+      multi_select: ${{ steps.properties.outputs.assignees }}
+    },
+    Labels: {
+      multi_select: ${{ steps.properties.outputs.labels }}
+    },
+    Date: {
+      date: ${{ steps.properties.outputs.date }}
+    },
+    Link: {
+      url: $link
+    }
   }
-}
+}' body.json)
+
 …
 ```
 
