@@ -108,7 +108,45 @@ body=$(jq --arg title "$ISSUE_TITLE" --arg link "$ISSUE_URL" '. + {
 
 <br />
 
-### 4. Try issues!
+## 4. (Optional) Link to GitHub PR
+
+> GitHub PR - Notion 작업 연동
+
+- [x] Notion - GitHub 워크스페이스 앱 연결 :star:
+
+  1. 사이드바 **`설정`**
+  2. '**내 연결**' 클릭 후 **`GitHub (Workspace)`** 찾기
+  3. GitHub 계정 및 Repository 연결
+
+  :point_right: [GitHub 통합 - GitHub API 통합 설정 | Notion 도움말 센터](https://notion.com/ko/help/github)
+
+- [x] issues-notion-sync 페이지에서 연동하고자 하는 작업의 **_ID_** 확인
+
+  > (Default) **`ISSUE-*`**
+
+- [x] PR 설명에 **_매직워드_** + **_ID_** 입력
+
+  > ex) **`ref ISSUE-1`**, **`fix ISSUE-1`**, …
+
+  :point_down: <mark>매직워드 종류</mark>
+
+  ```
+  · close, closes, closed
+  - fix, fixes, fixed
+  - resolve, resolves, resolved
+  - complete, completes, completed, completing
+  - ref, references
+  - part of
+  - related to
+  - contributes to
+  - towards
+  ```
+
+<br />
+
+:heavy_check_mark: <mark>공식 문서를 보고싶다면?</mark> :point_right: [GitHub 통합 - 매직워드를 사용하여 GitHub PR을 Notion 작업에 링크하기 | Notion 도움말 센터](https://notion.com/ko/help/github)
+
+:heavy_check_mark: <mark>구체적인 예시가 보고싶다면?</mark> :point_right: [샘플 PR](https://github.com/herokwon/issues-notion-sync/pull/1)
 
 <br />
 
