@@ -132,14 +132,14 @@ body=$(jq --arg title "$ISSUE_TITLE" --arg link "$ISSUE_URL" '. + {
 
   ```
   · close, closes, closed
-  - fix, fixes, fixed
-  - resolve, resolves, resolved
-  - complete, completes, completed, completing
-  - ref, references
-  - part of
-  - related to
-  - contributes to
-  - towards
+  · fix, fixes, fixed
+  · resolve, resolves, resolved
+  · complete, completes, completed, completing
+  · ref, references
+  · part of
+  · related to
+  · contributes to
+  · towards
   ```
 
 <br />
