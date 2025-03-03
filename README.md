@@ -23,7 +23,7 @@
 
 - [x] [**GitHub Token**](https://github.com/settings/tokens) 생성
 
-- [x] [**issues-notion-sync**](https://herokwon.notion.site/1a6ca0268cb380278a7becb09c697ec6?v=1a6ca0268cb380c39bfd000c07e0b778) Notion 템플릿 복제
+- [x] [**issues-notion-sync**](https://herokwon.notion.site/1abfaa4146a8819c9491de8e746ae707?v=1abfaa4146a88115ac8d000ccbb2a4f3&pvs=4) Notion 템플릿 복제
 
 - [x] Notion [**API 통합**](https://notion.so/profile/integrations) 시크릿 생성  
        :point_right: [Notion API 통합 | Notion 도움말 센터](https://notion.com/ko/help/create-integrations-with-the-notion-api)
@@ -144,9 +144,11 @@ body=$(jq --arg title "$ISSUE_TITLE" --arg link "$ISSUE_URL" '. + {
 
 <br />
 
-:heavy_check_mark: <mark>공식 문서를 보고싶다면?</mark> :point_right: [GitHub 통합 - 매직워드를 사용하여 GitHub PR을 Notion 작업에 링크하기 | Notion 도움말 센터](https://notion.com/ko/help/github)
+:heavy_check_mark: <mark>공식 문서를 보고싶다면?</mark>  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[GitHub 통합 - 매직워드를 사용하여 GitHub PR을 Notion 작업에 링크하기 | Notion 도움말 센터](https://notion.com/ko/help/github)
 
-:heavy_check_mark: <mark>구체적인 예시가 보고싶다면?</mark> :point_right: [샘플 PR](https://github.com/herokwon/issues-notion-sync/pull/1)
+:heavy_check_mark: <mark>구체적인 예시가 보고싶다면?</mark>  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[샘플 PR](https://github.com/herokwon/issues-notion-sync/pull/1)
 
 <br />
 
